@@ -2,17 +2,72 @@
 
 `ecb_rate.py` is a command-line tool to fetch historical EUR/USD exchange rates from the European Central Bank (ECB)'s Statistical Data Warehouse API.
 
----
+## Quick Start
 
-## Quick Start Options
+### Run Directly with `uv` (Recommended for Users)
 
-You can use this project in two ways:
+The easiest way to use this tool is with `uv`, which handles dependencies automatically. You can even run it directly from GitHub without downloading anything:
 
-### 1. Full Development & Testing (Recommended)
+```bash
+# Run directly from GitHub
+uv run https://raw.githubusercontent.com/igor-kupczynski/tools/main/ecb-rate/ecb_rate.py 2025-04-29
 
-This approach uses a Python virtual environment and requirements.txt for a robust, reproducible workflow. It is ideal if you want to run tests or develop further.
+# Or if you've downloaded the script
+uv run ecb_rate.py 2025-04-29
+```
 
-#### **Setup**
+### Usage Examples
+
+1. **Fetch rate for a specific date:**
+   ```bash
+   uv run ecb_rate.py 2025-04-29
+   ```
+   Output:
+   ```
+   Fetching EURUSD rate for 2025-04-29...
+   EURUSD rate for 2025-04-29: 1.1373
+   ```
+
+2. **Fetch the most recent rate before a date** (useful for holidays/weekends):
+   ```bash
+   uv run ecb_rate.py 2025-05-01 -p
+   ```
+   Output:
+   ```
+   Looking for rate prior to 2025-05-01 (up to 10 days back)...
+   EURUSD rate for 2025-04-30 (1 day before 2025-05-01): 1.1373
+   ```
+
+3. **Weekend example** (Saturday, gets Friday's rate):
+   ```bash
+   uv run ecb_rate.py 2025-05-03 --previous
+   ```
+   Output:
+   ```
+   Looking for rate prior to 2025-05-03 (up to 10 days back)...
+   EURUSD rate for 2025-05-02 (1 day before 2025-05-03): 1.1343
+   ```
+
+## Command Options
+
+```
+Usage: ecb_rate.py [OPTIONS] DATE
+
+  Fetch ECB EURUSD exchange rate for a given date.
+
+  DATE should be in YYYY-MM-DD format.
+
+Options:
+  -p, --previous            Fetch the most recent available rate *before* the
+                            specified DATE.
+  --max-days-back INTEGER   Maximum number of days to look back when using
+                            --previous (default: 10)
+  --help                    Show this message and exit.
+```
+
+## For Contributors & Testers
+
+If you want to contribute to the project or run the integration tests, use a Python virtual environment:
 
 ```bash
 # Create and activate a virtual environment
@@ -21,89 +76,13 @@ source .venv/bin/activate
 
 # Install dependencies
 pip install -r requirements.txt
-```
 
-#### **Run the Script**
-
-```bash
-python ecb_rate.py DATE [OPTIONS]
-```
-
-#### **Run the Tests**
-
-```bash
+# Run the tests
 pytest -v
-```
 
-#### **Deactivate when done**
-
-```bash
+# Deactivate when done
 deactivate
 ```
-
----
-
-### 2. Quick Script Run with uv (No Setup)
-
-If you only want to run the script and have `uv` installed, you can run it directly—`uv` will handle dependencies automatically:
-
-```bash
-uv run ecb_rate.py DATE [OPTIONS]
-```
-
----
-
-## Usage
-
-**Arguments:**
-
--   `DATE`: The target date for which to fetch the exchange rate, in `YYYY-MM-DD` format.
-
-**Options:**
-
--   `-p`, `--previous`: Fetch the most recent available rate *before* the specified `DATE`.
--   `--max-days-back INTEGER`: Maximum number of days to look back when using `--previous` (default: 10).
--   `--help`: Show the help message and exit.
-
-**Examples:**
-
-1.  Fetch the rate for a specific date:
-    ```bash
-    uv run ecb_rate.py 2025-04-29
-    # or, if using venv:
-    python ecb_rate.py 2025-04-29
-    ```
-    Output:
-    ```
-    Fetching EURUSD rate for 2025-04-29...
-    EURUSD rate for 2025-04-29: <rate_value>
-    ```
-
-2.  Fetch the rate for the day *before* a specific date (e.g., if 2025-05-01 is a holiday, it might fetch for 2025-04-30):
-    ```bash
-    uv run ecb_rate.py 2025-05-01 -p
-    # or
-    python ecb_rate.py 2025-05-01 -p
-    ```
-    Output:
-    ```
-    Looking for rate prior to 2025-05-01 (up to 10 days back)...
-    EURUSD rate for 2025-04-30 (1 day before 2025-05-01): <rate_value>
-    ```
-
-3.  If no rate is found for a specific date (and `-p` is not used):
-    ```bash
-    uv run ecb_rate.py 2025-01-01
-    # or
-    python ecb_rate.py 2025-01-01
-    ```
-    Output:
-    ```
-    Fetching EURUSD rate for 2025-01-01...
-    No rate available for 2025-01-01. Use --previous/-p to get the most recent available rate.
-    ```
-
----
 
 ## License
 
